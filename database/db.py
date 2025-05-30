@@ -1,3 +1,6 @@
+import sys,os
+sys.path.append(os.getcwd())
+
 import aiosqlite
 
 DB_PATH = 'database/quiz_bot.db'

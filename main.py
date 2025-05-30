@@ -2,21 +2,12 @@ import asyncio
 import logging
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
-import aiosqlite
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
-
+from database.db import create_table, update_quiz_index, get_quiz_index
+from get_token.tkn import API_TOKEN
 
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
-
-def get_token():
-    with open('token.txt') as file:
-        token = file.readable()
-    return token
-
-
-# Замените "YOUR_BOT_TOKEN" на токен, который вы получили от BotFather
-API_TOKEN = get_token()
 
 
 # Объект бота
@@ -141,34 +132,6 @@ async def wrong_answer(callback: types.CallbackQuery):
         # Уведомление об окончании квиза
         await callback.message.answer("Это был последний вопрос. Квиз завершен!")
 
-
-async def create_table():
-    # Создаем соединение с базой данных (если она не существует, то она будет создана)
-    async with aiosqlite.connect('quiz_bot.db') as db:
-        # Выполняем SQL-запрос к базе данных
-        await db.execute('''CREATE TABLE IF NOT EXISTS quiz_state (user_id INTEGER PRIMARY KEY, question_index INTEGER)''')
-        # Сохраняем изменения
-        await db.commit()
-
-async def update_quiz_index(user_id, index):
-    # Создаем соединение с базой данных (если она не существует, она будет создана)
-    async with aiosqlite.connect('quiz_bot.db') as db:
-        # Вставляем новую запись или заменяем ее, если с данным user_id уже существует
-        await db.execute('INSERT OR REPLACE INTO quiz_state (user_id, question_index) VALUES (?, ?)', (user_id, index))
-        # Сохраняем изменения
-        await db.commit()
-
-async def get_quiz_index(user_id):
-     # Подключаемся к базе данных
-     async with aiosqlite.connect('quiz_bot.db') as db:
-        # Получаем запись для заданного пользователя
-        async with db.execute('SELECT question_index FROM quiz_state WHERE user_id = (?)', (user_id, )) as cursor:
-            # Возвращаем результат
-            results = await cursor.fetchone()
-            if results is not None:
-                return results[0]
-            else:
-                return 0
 
 def generate_options_keyboard(answer_options, right_answer):
   # Создаем сборщика клавиатур типа Inline

@@ -1,7 +1,7 @@
 import sys,os
 sys.path.append(os.getcwd())
 
-from database.db import update_quiz_index, get_quiz_index
+from app.db import update_quiz_index, get_quiz_index
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import types
 
@@ -58,7 +58,7 @@ def generate_options_keyboard(answer_options, right_answer):
             # Присваиваем данные для колбэк запроса.
             # Если ответ верный сформируется колбэк-запрос с данными 'right_answer'
             # Если ответ неверный сформируется колбэк-запрос с данными 'wrong_answer'
-            callback_data="right_answer" if option == right_answer else "wrong_answer")
+            callback_data=("right_answer#" + option) if option == right_answer else ("wrong_answer#" + option))
         )
 
     # Выводим по одной кнопке в столбик

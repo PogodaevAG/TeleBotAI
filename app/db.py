@@ -3,7 +3,7 @@ sys.path.append(os.getcwd())
 
 import aiosqlite
 
-DB_PATH = 'database/quiz_bot.db'
+DB_PATH = 'app/quiz_bot.db'
 
 async def create_table():
     # Создаем соединение с базой данных (если она не существует, то она будет создана)

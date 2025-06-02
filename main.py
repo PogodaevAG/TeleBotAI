@@ -7,7 +7,6 @@ from app.db import create_table
 from app.handlers import router
 
 
-
 async def main():
     # Объект бота
     bot = Bot(token=TOKEN)

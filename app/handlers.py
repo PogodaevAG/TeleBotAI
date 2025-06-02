@@ -7,15 +7,14 @@ from aiogram import types, F, Router
 from aiogram.filters.command import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
-from app.db import update_quiz_index, get_quiz_index, get_top_ranks, get_user_score, update_user_data, get_user_record, update_user_record
+from app.db import update_quiz_index, get_quiz_index, get_top_ranks, get_user_score
+from app.db import get_user_record, update_user_record, update_user_score, update_user_data
 from app.questions import quiz_data
 
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
 
-
 router = Router()
-
 
 # Хэндлер на команду /start
 @router.message(Command("start"))
@@ -83,9 +82,10 @@ async def right_answer(callback: types.CallbackQuery):
 
     # Обновление номера текущего вопроса в базе данных
     current_question_index += 1
+    await update_quiz_index(callback.from_user.id, current_question_index)
     # Обновление балл текущего пользователя
     user_score += 1
-    await update_user_data(callback.from_user.id, callback.from_user.username, current_question_index, user_score)
+    await update_user_score(callback.from_user.id, user_score)
 
     # Обновляем рекорд, если он ещё не инициализирован или он меньше текущего балла
     if user_record is None or user_record < user_score:
@@ -156,7 +156,8 @@ async def new_quiz(message):
     # сбрасываем значение текущего индекса вопроса квиза и балл в 0
     current_question_index = 0
     score = 0
-    await update_user_data(message.from_user.id, message.from_user.username, current_question_index, score)
+    user_record = await get_user_record(message.from_user.id)
+    await update_user_data(message.from_user.id, message.from_user.username, current_question_index, score, user_record)
 
     # запрашиваем новый вопрос для квиза
     await get_question(message, user_id)

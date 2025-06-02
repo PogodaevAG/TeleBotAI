@@ -16,15 +16,21 @@ async def create_table():
 
 
 async def update_quiz_index(user_id, index):
-    await execute_query('INSERT OR REPLACE INTO quiz_state (user_id, question_index) VALUES (?, ?)', (user_id, index))
+    await execute_query('UPDATE quiz_state SET question_index = (?) WHERE user_id = (?)', (index, user_id))
 
 
-async def update_user_data(user_id, user_name, index, score):
-    await execute_query('INSERT OR REPLACE INTO quiz_state (user_id, user_name, question_index, score) VALUES (?, ?, ?, ?)', 
-                        (user_id, user_name, index, score))
+async def update_user_score(user_id, score):
+    await execute_query('UPDATE quiz_state SET score = (?) WHERE user_id = (?)', (score, user_id))
+
 
 async def update_user_record(user_id, record):
     await execute_query('UPDATE quiz_state SET record = (?) WHERE user_id = (?)', (record, user_id))
+
+
+async def update_user_data(user_id, user_name, index, score, record):
+    await execute_query('INSERT OR REPLACE INTO quiz_state (user_id, user_name, question_index, score, record) VALUES (?, ?, ?, ?, ?)', 
+                        (user_id, user_name, index, score, record))
+
 
 async def get_user_score(user_id):
     return await get_value('SELECT score FROM quiz_state WHERE user_id = (?)', (user_id, ))
